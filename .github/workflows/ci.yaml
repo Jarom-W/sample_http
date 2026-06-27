@@ -1,0 +1,43 @@
+name: Build and Push Image
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      #Get the code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      #Set up Docker
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      #Login to GHCR
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      #Compute Git SHA
+      - name: Get SHA
+        id: vars
+        run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      #Build + Push Image
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/http_service/
+          push: true
+          tags: ghcr.io/jarom-w/http_service:${{ steps.vars.outputs.sha }}
+
