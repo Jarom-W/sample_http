@@ -1,7 +1,7 @@
 replicaCount: 3
 image:
   repository: ghcr.io/jarom-w/http_service
-  tag: latest
+  tag: a798afb
   pullPolicy: IfNotPresent
 
 service:
@@ -9,4 +9,4 @@ service:
   port: 3030
 
 app:
-  name: http_service 
+  name: http-service 
