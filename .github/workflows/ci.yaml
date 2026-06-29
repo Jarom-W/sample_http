@@ -41,3 +41,47 @@ jobs:
           push: true
           tags: ghcr.io/jarom-w/http_service:${{ steps.vars.outputs.sha }}
 
+  promote-dev:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout GitOps repo
+        uses: actions/checkout@v4
+        with:
+          repository: jarom-w/promote_pipeline
+          token: ${{ secrets.GITOPS_TOKEN }}
+          
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /user/bin/yq
+
+      - name: Update dev image tag
+        run: |
+          yq -i '.image.tag = strenv(SHA)' environments/http_service/dev/http-service.yaml
+        env:
+          SHA: ${{ env.SHA }}
+
+      - name: Commit change to dev image tag
+        run: |
+          git config user.name "ci-bot"
+          git config user.email "ci@bot.local"
+          git checkout -b update-dev-${SHA}
+          git add .
+          git commit -m " Update dev image to ${SHA}"
+
+      - name: Push branch
+        run: |
+          git push origin update-dev-${SHA}
+
+      - name: Create PR
+        run: |
+          gh pr create \
+            --repo jarom-w/promote_pipeline \
+            --base main \
+            --head update-dev-${SHA}
+            --title "Dev promotion: ${SHA}"
+            ==body "Automated dev image update"
+        env:
+          GH_TOKEN: ${{ secrets.GITOPS_TOKEN }}
