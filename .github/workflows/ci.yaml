@@ -73,7 +73,7 @@ jobs:
 
       - name: Push branch
         run: |
-          git push origin update-dev-${{SHA}}
+          git push origin update-dev-${{ env.SHA }}
 
       - name: Create PR
         run: |
