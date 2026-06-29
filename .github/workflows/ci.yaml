@@ -82,6 +82,6 @@ jobs:
             --base main \
             --head update-dev-${SHA}
             --title "Dev promotion: ${SHA}"
-            ==body "Automated dev image update"
+            --body "Automated dev image update"
         env:
           GH_TOKEN: ${{ secrets.GITOPS_TOKEN }}
