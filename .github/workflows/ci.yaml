@@ -12,6 +12,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    outputs:
+      sha: ${{ steps.vars.outputs.sha }}
+
     steps:
       #Get the code
       - name: Checkout
@@ -53,11 +56,6 @@ jobs:
           repository: jarom-w/promote_pipeline
           token: ${{ secrets.GITOPS_TOKEN }}
 
-      #Compute Git SHA
-      - name: Get SHA
-        id: vars
-        run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          
       - name: Install yq
         run: |
           sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
@@ -65,7 +63,7 @@ jobs:
 
       - name: Update dev image tag
         run: |
-          sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.sha }}/" environments/http_service/dev/http-service.yaml
+          sed -i "s/tag: .*/tag: ${{ needs.build.outputs.sha }}/" environments/http_service/dev/http-service.yaml
         env:
           SHA: ${{ env.SHA }}
 
@@ -74,7 +72,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add .
-          git commit -m " Update dev image to ${{ steps.vars.outputs.sha }}"
+          git commit -m " Update dev image to ${{ needs.build.outputs.sha }}"
 
       #Build + Push Image
       - name: Push branch
