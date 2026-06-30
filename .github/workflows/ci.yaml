@@ -46,16 +46,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      #Compute Git SHA
-      - name: Get SHA
-        id: vars
-        run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Checkout GitOps repo
         uses: actions/checkout@v4
         with:
           repository: jarom-w/promote_pipeline
           token: ${{ secrets.GITOPS_TOKEN }}
+
+      #Compute Git SHA
+      - name: Get SHA
+        id: vars
+        run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           
       - name: Install yq
         run: |
