@@ -59,7 +59,7 @@ jobs:
 
       - name: Update dev image tag
         run: |
-          sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.sha }}/"" environments/http_service/dev/http-service.yaml
+          sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.sha }}/" environments/http_service/dev/http-service.yaml
         env:
           SHA: ${{ env.SHA }}
 
