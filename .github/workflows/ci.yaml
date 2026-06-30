@@ -67,13 +67,14 @@ jobs:
         run: |
           git config user.name "ci-bot"
           git config user.email "ci@bot.local"
-          git checkout -b update-dev-${SHA}
+          git checkout -b update-dev-${GITHUB_SHA::7}
           git add .
           git commit -m " Update dev image to ${SHA}"
 
+      #Build + Push Image
       - name: Push branch
         run: |
-          git push origin update-dev-${{ env.SHA }}
+          git push origin update-dev-${GITHUB_SHA::7}
 
       - name: Create PR
         run: |
