@@ -65,24 +65,14 @@ jobs:
 
       - name: Commit change to dev image tag
         run: |
-          git config user.name "ci-bot"
-          git config user.email "ci@bot.local"
-          git checkout -b update-dev-${GITHUB_SHA::7}
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           git add .
-          git commit -m " Update dev image to ${SHA}"
+          git commit -m " Update dev image to ${{ steps.vars.outputs.sha }}"
 
       #Build + Push Image
       - name: Push branch
         run: |
-          git push origin update-dev-${GITHUB_SHA::7}
-
-      - name: Create PR
-        run: |
-          gh pr create \
-            --repo jarom-w/promote_pipeline \
-            --base main \
-            --head update-dev-${SHA}
-            --title "Dev promotion: ${SHA}"
-            --body "Automated dev image update"
+          git push
         env:
           GH_TOKEN: ${{ secrets.GITOPS_TOKEN }}
